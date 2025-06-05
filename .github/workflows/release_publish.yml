@@ -22,13 +22,14 @@ permissions:
 
 jobs:
   TagRelease:
-    uses: aws-deadline/.github/.github/workflows/reusable_tag_release.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_tag_release.yml@mainline
     secrets: inherit
     with:
       tag: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || '' }}
 
   UnitTests:
     name: Unit Tests
+    needs: TagRelease
     uses: ./.github/workflows/code_quality.yml
     with:
       tag: ${{ needs.TagRelease.outputs.tag }}
@@ -39,11 +40,10 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: aws-deadline/.github/.github/workflows/reusable_integration_test.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_integration_test.yml@mainline
     secrets: inherit
     with:
       repository: ${{ github.event.repository.name }}
-      branch: mainline
       environment: mainline
       os: linux
       tag: ${{ needs.TagRelease.outputs.tag }}
@@ -54,18 +54,17 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: aws-deadline/.github/.github/workflows/reusable_integration_test.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_integration_test.yml@mainline
     secrets: inherit
     with:
       repository: ${{ github.event.repository.name }}
-      branch: mainline
       environment: mainline
       os: windows
       tag: ${{ needs.TagRelease.outputs.tag }}
 
   PreRelease:
     needs: [TagRelease, LinuxIntegrationTests, WindowsIntegrationTests]
-    uses: aws-deadline/.github/.github/workflows/reusable_prerelease.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_prerelease.yml@mainline
     permissions:
       id-token: write
       contents: write
@@ -75,7 +74,7 @@ jobs:
 
   BuildAndStageInstallers:
     needs: [TagRelease, PreRelease]
-    uses: aws-deadline/.github/.github/workflows/reusable_build_and_stage_installers.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_build_and_stage_installers.yml@mainline
     secrets: inherit
     permissions:
       id-token: write
@@ -95,28 +94,30 @@ jobs:
          :
 
   Release:
-      needs: [TagRelease, IsCondaReady]
-      uses: aws-deadline/.github/.github/workflows/reusable_release.yml@mainline
-      secrets: inherit
-      permissions:
-        id-token: write
-        contents: write
-      with:
-          tag: ${{ needs.TagRelease.outputs.tag }}
+    needs: [TagRelease, IsCondaReady]
+    uses: moorec-aws/.github/.github/workflows/reusable_release.yml@mainline
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: write
+    with:
+        tag: ${{ needs.TagRelease.outputs.tag }}
   
   Publish:
-      needs: [TagRelease, Release]
-      uses: aws-deadline/.github/.github/workflows/reusable_publish_python.yml@mainline
-      permissions:
-        id-token: write
-      secrets: inherit
-      with:
-          tag: ${{ needs.TagRelease.outputs.tag }}
+    if: ${{ false }}  # This will always skip this job
+    needs: [TagRelease, Release]
+    uses: moorec-aws/.github/.github/workflows/reusable_publish_python.yml@mainline
+    permissions:
+      id-token: write
+    secrets: inherit
+    with:
+        tag: ${{ needs.TagRelease.outputs.tag }}
   
 
   # PyPI does not support reusable workflows yet
   # # See https://github.com/pypi/warehouse/issues/11096
   PublishToPyPI:
+    if: ${{ false }}  # This will always skip this job
     needs: Publish
     runs-on: ubuntu-latest
     environment: release
