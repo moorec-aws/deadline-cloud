@@ -1,3 +1,10 @@
+## 0.51.0 (2025-06-05)
+
+
+
+### Bug Fixes
+* fix ([`e3def3a`](https://github.com/moorec-aws/deadline-cloud/commit/e3def3abb994b05e0b9303c432aac82b347612f6))
+
 ## 0.50.1 (2025-06-04)
 
 
