@@ -8,7 +8,7 @@ AWS Deadline Cloud client is a multi-purpose python library and command line too
 [Open Job Description (OpenJD)][openjd] jobs to [AWS Deadline Cloud][deadline-cloud].
 
 To support building workflows on top of AWS Deadline Cloud, it implements its own user interaction, job creation, file upload/download, and other useful
-helpers around the service's API. It can function as a pipeline tool, a standalone GUI application, or even be embedded within other applications' runtimes.
+helpers around the service's API. Itasfasf can function as a pipeline tool, a standalone GUI application, or even be embedded within other applications' runtimes.
 
 Notable features include:
 * A command-line interface with subcommands for querying your AWS Deadline Cloud resources, and submitting jobs to your AWS Deadline Cloud Farm.
